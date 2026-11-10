@@ -48,7 +48,7 @@ textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;b
 <body>
 <main>
 <h1>🍽️ Tuki</h1>
-<nav><button id="t-ins">Insumos</button><button id="t-rec">Recetas</button><button id="t-pla">Platos</button><button id="t-mer">Mercadería</button><button id="t-evt">Evento</button></nav>
+<nav><button id="t-ins">Insumos</button><button id="t-rec">Recetas</button><button id="t-pla">Platos</button><button id="t-evt">Evento</button></nav>
 <div id="app"><p class="mut">Cargando…</p></div>
 <div class="mut" style="text-align:center;margin:16px 0;font-size:12px">Copia · base b11</div>
 </main>
@@ -183,7 +183,7 @@ document.addEventListener('change',e=>{const t=e.target;if(!imp)return;if(t.data
 document.addEventListener('input',e=>{const t=e.target,k=t.dataset.of;if(!k||!od||k==='add')return;od[k]=t.value;totOd()});
 document.addEventListener('change',e=>{const t=e.target;if(t.dataset.of!=='add'||!od||!t.value)return;const p=rec[t.value];if(!p)return;const ex=od.items.find(i=>i.p===t.value);if(ex)ex.q++;else od.items.push({p:t.value,n:p.nombre,q:1,pr:+p.precio||0,c:recCost(p)});t.blur();render(true)});
 function render(force){if(window.locked)return;if(!force&&(editIns||draft||od||imp||cd||pd||mf||gf||cce||bc))return;const a=document.activeElement;if(!force&&a&&(((tab==='evt'||tab==='ven'||tab==='dim'||tab==='stk'||tab==='eti'||tab==='cmv'||tab==='caja')&&/INPUT|SELECT/.test(a.tagName))||a.dataset.q!==undefined)&&$('#app').contains(a))return;
- $('#t-ins').className=tab==='ins'?'on':'';$('#t-rec').className=tab==='rec'?'on':'';$('#t-pla').className=tab==='pla'?'on':'';$('#t-evt').className=tab==='evt'?'on':'';$('#t-mer').className=(tab==='com'||tab==='dim'||tab==='stk'||tab==='eti')?'on':'';$('#t-mer').hidden=!adm;
+ $('#t-ins').className=tab==='ins'?'on':'';$('#t-rec').className=tab==='rec'?'on':'';$('#t-pla').className=tab==='pla'?'on':'';$('#t-evt').className=tab==='evt'?'on':'';
  if(!ready){return}
  $('#app').innerHTML=tab==='ins'?viewIns():tab==='com'?viewCom():tab==='dim'?viewDim():tab==='stk'?viewStock():tab==='eti'?viewEti():tab==='ven'?viewVen():tab==='dash'?viewDash():tab==='cfg'?viewCfg():tab==='cmv'?viewCmv():tab==='caja'?viewCaja():tab==='evt'?viewEvt():viewRec();
 }
@@ -220,8 +220,8 @@ function listRec(){const A=act();
  if(!l.length)return Object.values(rec).some(r=>(r.tipo==='base')===(tab==='rec'))?EMPTY:(tab==='rec'?'<p class="mut">Acá van las preparaciones intermedias que hacés antes del servicio (salsas, masas, fondos, cocciones).</p>':'<p class="mut">Acá van los platos finales del servicio, con sus recetas, insumos, extras y packaging.</p>');
  return l.map(([id,r])=>{const x=mg(r),o=opn.has(tab+id),base=r.tipo==='base';let right,det;
   if(base){right=`<span class="mut">${(r.sub||[]).length?(r.sub.length+' productos'):'$'+x.c.toFixed(2)+'/'+(r.un||'g')}</span>`;det=`${r.cat?esc(r.cat)+' · ':''}${(r.sub||[]).length?'Costo total '+money(recTot(r)):`Rinde ${r.porciones} ${r.un||'g'} · Costo total ${money(recTot(r))}`}`+(r.sub||[]).map(s=>`<div>• ${esc(s.n)}: ${s.q} ${s.un} · $${ruc(r,s.id,[]).toFixed(2)}/${s.un}</div>`).join('')}
-  else{right=`<span class="mut">${money(r.precio)}</span><span class="${cls(x.pct)}" style="font-weight:600">${x.pct.toFixed(0)}%</span>`;det=`${r.cat?esc(r.cat)+' · ':''}Costo ${money(x.c)} · Venta ${money(r.precio)} · Margen ${money(x.m)}`}
-  return`<div class="card c"><div class="hd" data-a="tg" data-id="${id}"><span class="nm">${dot(base?A.R.has(id):r.activo!==false)}${esc(r.nombre)}</span>${right}${chv(o)}</div>${o?`<div class="bd"><div class="mut" style="margin:8px 0">${!base&&r.activo===false?'<b class="ko">Plato inactivo</b> · ':''}${base&&!A.R.has(id)?'<b class="ko">Sin uso en platos activos</b> · ':''}${det}${base&&(r.vr||r.vc)?'<div>Vida útil: '+(r.vr?'refrigerada '+r.vr+' días':'')+(r.vr&&r.vc?' · ':'')+(r.vc?'congelada '+r.vc+' días':'')+'</div>':''}</div>${adm?`<div class="row"><button data-a="editRec" data-id="${id}">Editar</button>${base?'':`<button data-a="tgAct" data-id="${id}">${r.activo!==false?'Desactivar':'Activar'}</button>`}<button class="x" data-a="delRec" data-id="${id}">Borrar</button></div>`:''}</div>`:''}</div>`}).join('')}
+  else{right=`<span class="mut">Costo ${money(x.c)}</span>`;det=`${r.cat?esc(r.cat)+' · ':''}Rinde ${r.porciones||1} porciones · Costo por porción ${money(x.c)}`}
+  return`<div class="card c"><div class="hd" data-a="tg" data-id="${id}"><span class="nm">${dot(base?A.R.has(id):r.activo!==false)}${esc(r.nombre)}</span>${right}${chv(o)}</div>${o?`<div class="bd"><div class="mut" style="margin:8px 0">${!base&&r.activo===false?'<b class="ko">Plato inactivo</b> · ':''}${base&&!A.R.has(id)?'<b class="ko">Sin uso en platos activos</b> · ':''}${det}${base&&(r.vr||r.vc)?'<div>Vida útil: '+(r.vr?'refrigerada '+r.vr+' días':'')+(r.vr&&r.vc?' · ':'')+(r.vc?'congelada '+r.vc+' días':'')+'</div>':''}</div>${recExtra(r)}${adm?`<div class="row"><button data-a="editRec" data-id="${id}">Editar</button>${base?'':`<button data-a="tgAct" data-id="${id}">${r.activo!==false?'Desactivar':'Activar'}</button>`}<button class="x" data-a="delRec" data-id="${id}">Borrar</button></div>`:''}</div>`:''}</div>`}).join('')}
 function viewRec(){
  if(draft)return viewDraft();
  return(adm?'<button class="p" data-a="newRec" style="width:100%;margin-bottom:10px">'+(tab==='rec'?'+ Nueva receta':'+ Nuevo plato')+'</button>':'<p class="mut">Solo lectura: para editar necesitás permiso de Editor.</p>')+srch(tab)+chips(tab)+actChips(tab)+'<div id="lst">'+listRec()+'</div>'}
@@ -660,8 +660,8 @@ function viewDraft(){
  if(ibF!==null){const f=ibF;ibF=null;setTimeout(()=>{const x=document.querySelector('[data-f="q"][data-k="'+f+'"]');if(x)x.focus()})}
  const opts=Object.entries(ins).sort((a,b)=>a[1].nombre.localeCompare(b[1].nombre));
  const B=draft.tipo==='base',bases=Object.entries(rec).filter(([id,r])=>r.tipo==='base'&&id!==draft.id).sort((a,b)=>a[1].nombre.localeCompare(b[1].nombre));
- let h=`<div class="card"><label>${B?'Nombre de la receta':'Nombre del plato'}</label><input id="r-n" value="${esc(draft.nombre)}"><label>Categoría</label>${catSel(B?'rec':'pla','r-c',draft.cat||'')}${B?'':`<label style="display:flex;gap:8px;align-items:center;font-size:15px;color:inherit"><input type="checkbox" id="r-ac" style="width:auto" ${draft.activo!==false?'checked':''}>Plato activo</label>`}${B?`<div class="g2"><div><label>Vida útil refrigerada (días)</label><input type="number" inputmode="numeric" id="r-vr" value="${draft.vr||''}"></div><div><label>Vida útil congelada (días)</label><input type="number" inputmode="numeric" id="r-vc" value="${draft.vc||''}"></div></div>`:''}
- ${B?'':`<div class="g2"><div><label>Porciones que rinde</label><input id="r-po" type="number" inputmode="decimal" value="${draft.porciones||1}"></div><div><label>Precio de venta ($)</label><input id="r-pr" type="number" inputmode="decimal" value="${draft.precio??''}"></div></div>`}
+ let h=`<div class="card"><label>${B?'Nombre de la receta':'Nombre del plato'}</label><input id="r-n" value="${esc(draft.nombre)}"><label>Autor de la receta</label><input id="r-au" value="${esc(draft.autor||'')}">${draft.cargoN?`<div class="mut" style="margin-top:4px">Cargada por ${esc(draft.cargoN)}</div>`:''}<label>Categoría</label>${catSel(B?'rec':'pla','r-c',draft.cat||'')}${B?'':`<label style="display:flex;gap:8px;align-items:center;font-size:15px;color:inherit"><input type="checkbox" id="r-ac" style="width:auto" ${draft.activo!==false?'checked':''}>Plato activo</label>`}${B?`<div class="g2"><div><label>Vida útil refrigerada (días)</label><input type="number" inputmode="numeric" id="r-vr" value="${draft.vr||''}"></div><div><label>Vida útil congelada (días)</label><input type="number" inputmode="numeric" id="r-vc" value="${draft.vc||''}"></div></div>`:''}
+ ${B?'':`<label>Porciones que rinde</label><input id="r-po" type="number" inputmode="decimal" value="${draft.porciones||1}">`}
  <label>Ingredientes</label><div id="ings">`;
  draft.ing.forEach((l,k)=>{const i=ins[l.i],R=l.t==='r',ph=R?(l.s?((rec[l.i]?.sub||[]).find(y=>y.id===l.s)?.un||'g'):(rec[l.i]?.un||'g')):(i?UN[i.un].r:'cant.');
   const nm_=R?(rec[l.i]?(l.s?(((rec[l.i].sub||[]).find(y=>y.id===l.s)||{}).n||'?'):rec[l.i].nombre):'(receta eliminada)'):(i?i.nombre:'(insumo eliminado)');
@@ -670,6 +670,7 @@ function viewDraft(){
   <span class="mut c" id="lc${k}"></span><button class="x" data-a="rmIng" data-k="${k}">✕</button></div>`});
  h+=`</div><input type="search" id="ib" data-ib="1" autocomplete="off" placeholder="Buscar ingrediente para agregar…" style="margin-top:6px" value="${esc(ibq)}"><div id="ibr">${ibList()}</div>
  ${B?`<label style="margin-top:14px">Qué rinde esta receta</label>${(draft.sub||[]).length?'':`<div class="card" style="margin-bottom:6px"><div class="g2"><div><label>Cantidad que rinde</label><input id="r-po" type="number" inputmode="decimal" value="${draft.porciones||1}"></div><div><label>Unidad</label><select id="r-un">${['g','ml','u'].map(u=>`<option ${draft.un===u?'selected':''}>${u}</option>`).join('')}</select></div></div></div>`}<label style="margin-top:14px">Si de esta receta sale más de un producto</label><div class="mut" style="margin-bottom:6px">Ej: el jugo de cocción de una carne braseada. Cargá todos los productos (también el principal) con el % del costo que se lleva cada uno. Solo ellos aparecen al armar otras recetas.</div>${(draft.sub||[]).map((x,k)=>`<div class="card" style="margin-bottom:6px"><div class="g2"><div><label>Nombre</label><input data-sk="${k}" data-sf="n" value="${esc(x.n)}"></div><div><label>% del costo</label><input type="number" inputmode="decimal" data-sk="${k}" data-sf="pct" value="${x.pct??0}"></div><div><label>Cantidad</label><input type="number" inputmode="decimal" data-sk="${k}" data-sf="q" value="${x.q??''}"></div><div><label>Unidad</label><select data-sk="${k}" data-sf="un">${['g','ml','u'].map(u=>`<option ${x.un===u?'selected':''}>${u}</option>`).join('')}</select></div></div><button class="x" data-a="rmSub" data-k="${k}" style="margin-top:8px">Quitar</button></div>`).join('')}<button data-a="addSub">${(draft.sub||[]).length?'+ Otro producto':'Dividir en varios productos'}</button>`:''}
+ ${formExtra()}
  <div id="tot" class="card" style="margin:12px 0 0"></div>
  <div class="row" style="margin-top:12px"><button class="p" data-a="saveRec">Guardar</button><button data-a="cancel">Cancelar</button></div></div>`;
  setTimeout(totals);return h}
@@ -678,9 +679,7 @@ function totals(){
  draft.ing.forEach((l,k)=>{const i=ins[l.i],e=$('#lc'+k),s=l.t==='r'&&rec[l.i];if(e)e.textContent=s?money(ruc(s,l.s,[draft.id,l.i])*(+l.q||0)):(i&&l.t!=='r'?money(useCost(i)*(+l.q||0)/UN[i.un].f):'')});
  const x=mg(draft);
  if(draft.tipo==='base'){const T=recTot(draft),sp=spct(draft);let h=`<div class="row"><div class="sp mut">Costo total de la elaboración</div><div class="big">${money(T)}</div></div><div class="row" style="${(draft.sub||[]).length?'display:none':''}"><div class="sp mut">Costo por ${draft.un||'g'}</div><div class="big">$${ruc(draft,null,[draft.id]).toFixed(2)}/${draft.un||'g'}</div></div>`;for(const y of draft.sub||[])h+=`<div class="row"><div class="sp mut">${esc(y.n||'Producto')} (${(()=>{const S=draft.sub,s=S.reduce((a,z)=>a+(+z.pct||0),0);return(s>0?(+y.pct||0)/s*100:100/S.length).toFixed(0)})()}% del costo)</div><div class="big">$${ruc(draft,y.id,[draft.id]).toFixed(2)}/${y.un||'g'}</div></div>`;$('#tot').innerHTML=h;return}
- $('#tot').innerHTML=`<div class="row"><div class="sp mut">Costo por porción</div><div class="big">${money(x.c)}</div></div>
- <div class="row"><div class="sp mut">Margen por porción</div><div class="big ${cls(x.pct)}">${money(x.m)} (${x.pct.toFixed(0)}%)</div></div>
- <div class="row"><div class="sp mut">Costo / precio de venta</div><div>${draft.precio?(100-x.pct).toFixed(0)+'%':'—'}</div></div>`}
+ $('#tot').innerHTML=`<div class="row"><div class="sp mut">Costo por porción</div><div class="big">${money(x.c)}</div></div>`}
 
 document.addEventListener('click',e=>{
  const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,id=b.dataset.id,k=+b.dataset.k;
@@ -766,7 +765,7 @@ document.addEventListener('click',e=>{
   if(!old||old.precio!==p)hist.push({f:Date.now(),p});
   const d={nombre:n,un,precio:p,emp,cap,cu,pe:+pe.toFixed(2),merma:+$('#f-m').value||0,prov:$('#f-s').value.trim(),cat:$('#f-c').value,hist:hist.slice(-20)};
   save('insumos',editIns==='new'?uid():editIns,d);editIns=null;toast('Guardado: '+n+' · $'+p.toLocaleString('es-AR',{maximumFractionDigits:2})+' por '+un)}
- else if(a==='newRec')draft={id:uid(),tipo:tab==='rec'?'base':'plato',un:'g',activo:true,cat:filt[tab]||'',nombre:'',porciones:1,precio:'',ing:[]};
+ else if(a==='newRec')draft={id:uid(),cargo:meId||'',cargoN:names[meId]||'',autor:'',tipo:tab==='rec'?'base':'plato',un:'g',activo:true,cat:filt[tab]||'',nombre:'',porciones:1,precio:'',ing:[]};
  else if(a==='editRec'){const r=rec[id];draft=JSON.parse(JSON.stringify({id,...r,ing:r.ing||[]}))}
  else if(a==='delRec')return del('recetas',id);
  else if(a==='addIng'){sync();draft.ing.push({i:'',q:''})}
@@ -774,9 +773,9 @@ document.addEventListener('click',e=>{
  else if(a==='addSub'){sync();draft.sub=draft.sub||[];if(!draft.sub.length)draft.sub.push({id:uid(),n:draft.pn||draft.nombre,q:draft.porciones||'',un:draft.un||'g',pct:100});draft.sub.push({id:uid(),n:'',q:'',un:'ml',pct:0})}
  else if(a==='rmSub'){sync();draft.sub.splice(k,1);if(draft.sub.length===1){const x=draft.sub[0];draft.porciones=+x.q||1;draft.un=x.un;draft.sub=[]}}
  else if(a==='saveRec'){sync();if(!draft.nombre.trim())return note('Poné un nombre');
-  const{id:i,...d}=draft;d.ing=d.ing.filter(l=>l.i&&+l.q>0);d.sub=(d.sub||[]).filter(x=>x.n&&+x.q>0);if(d.tipo==='base'){d.vr=+d.vr||0;d.vc=+d.vc||0}save('recetas',i,d);draft=null}
+  const{id:i,...d}=draft;d.ing=d.ing.filter(l=>l.i&&+l.q>0);d.sub=(d.sub||[]).filter(x=>x.n&&+x.q>0);d.pasos=(d.pasos||[]).map(x=>String(x).trim()).filter(Boolean);if(d.tipo==='base'){d.vr=+d.vr||0;d.vc=+d.vc||0}save('recetas',i,d);draft=null}
  render(true);if(/^(editIns|newIns|editRec|newRec|newOd|editOd|impOpen|newCom|newPag|dmCom|newMed|editMed|newGas|editGas|ccnew|ccedit|bcopen)$/.test(a))window.scrollTo(0,0)});
-function sync(){if(!draft||!$('#r-n'))return;draft.nombre=$('#r-n').value;if($('#r-po'))draft.porciones=+$('#r-po').value||1;if($('#r-pr'))draft.precio=+$('#r-pr').value||0;if($('#r-un'))draft.un=$('#r-un').value;if($('#r-pn'))draft.pn=$('#r-pn').value;if($('#r-c')&&$('#r-c').value!=='__new')draft.cat=$('#r-c').value;if($('#r-ac'))draft.activo=$('#r-ac').checked;if($('#r-vr'))draft.vr=$('#r-vr').value;if($('#r-vc'))draft.vc=$('#r-vc').value}
+function sync(){if(!draft||!$('#r-n'))return;draft.nombre=$('#r-n').value;if($('#r-po'))draft.porciones=+$('#r-po').value||1;if($('#r-pr'))draft.precio=+$('#r-pr').value||0;if($('#r-un'))draft.un=$('#r-un').value;if($('#r-pn'))draft.pn=$('#r-pn').value;if($('#r-c')&&$('#r-c').value!=='__new')draft.cat=$('#r-c').value;if($('#r-ac'))draft.activo=$('#r-ac').checked;if($('#r-vr'))draft.vr=$('#r-vr').value;if($('#r-vc'))draft.vc=$('#r-vc').value;if($('#r-au'))draft.autor=$('#r-au').value;if($('#r-co'))draft.coment=$('#r-co').value}
 document.addEventListener('input',e=>{
  if(!draft)return;const t=e.target;
  if(t.dataset.sf){const x=draft.sub[+t.dataset.sk];x[t.dataset.sf]=(t.dataset.sf==='n'||t.dataset.sf==='un')?t.value:+t.value}else if(t.dataset.f==='q')draft.ing[+t.dataset.k].q=t.value;else sync();totals()});
@@ -785,7 +784,22 @@ document.addEventListener('change',e=>{const t=e.target;
  if(!draft)return;
  if(t.dataset.f==='i'){const l=draft.ing[+t.dataset.k],v=t.value;const p=v.split(':');if(p[0]==='r'){l.t='r';l.i=p[1];if(p[2])l.s=p[2];else delete l.s}else{delete l.t;delete l.s;l.i=v}sync();render()}
  else if(t.id==='r-t'){sync();render()}});
-for(const[s,t]of[['ins','ins'],['rec','rec'],['pla','pla'],['mer','com'],['evt','evt']])$('#t-'+s).onclick=()=>{tab=t==='com'?msec:t;editIns=null;draft=null;od=null;imp=null;cd=null;pd=null;mf=null;gf=null;cce=null;bc=null;if(document.activeElement)document.activeElement.blur();render()};
+for(const[s,t]of[['ins','ins'],['rec','rec'],['pla','pla'],['evt','evt']])$('#t-'+s).onclick=()=>{tab=t==='com'?msec:t;editIns=null;draft=null;od=null;imp=null;cd=null;pd=null;mf=null;gf=null;cce=null;bc=null;if(document.activeElement)document.activeElement.blur();render()};
+
+// ===== EXTRAS DE RECETA =====
+const okImg=u=>typeof u==='string'&&u.startsWith('data:image/');
+function recExtra(r){let h='';const m=[];if(r.autor)m.push('Autor: <b>'+esc(r.autor)+'</b>');if(r.cargoN)m.push('Cargada por '+esc(r.cargoN));if(m.length)h+=`<div class="mut" style="margin:4px 0">${m.join(' · ')}</div>`;
+ if(okImg(r.foto))h+=`<img src="${esc(r.foto)}" alt="" style="max-width:100%;max-height:320px;border-radius:8px;margin:8px 0">`;
+ const P=(r.pasos||[]).filter(x=>String(x).trim());if(P.length)h+=`<div style="margin:8px 0"><b>Paso a paso</b><ol style="margin:6px 0 0 20px;padding:0">${P.map(p=>`<li style="margin-bottom:4px;white-space:pre-wrap">${esc(p)}</li>`).join('')}</ol></div>`;
+ if(r.coment&&r.coment.trim())h+=`<div style="margin:8px 0"><b>Comentarios</b><div style="white-space:pre-wrap">${esc(r.coment)}</div></div>`;return h}
+function formExtra(){const d=draft;return`<label style="margin-top:14px">Paso a paso</label><div>${(d.pasos||[]).map((p,k)=>`<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px"><div class="mut" style="padding-top:8px">${k+1}.</div><textarea data-ps="${k}" rows="2" style="flex:1">${esc(p)}</textarea><button class="x" data-ev2="rmPaso" data-k="${k}">✕</button></div>`).join('')}</div><button data-ev2="addPaso">+ Agregar paso</button>
+<label style="margin-top:14px">Foto</label>${okImg(d.foto)?`<img src="${esc(d.foto)}" alt="" style="max-width:100%;max-height:240px;border-radius:8px;display:block;margin-bottom:6px"><button class="x" data-ev2="rmFoto">Quitar foto</button>`:'<input type="file" accept="image/*" id="r-ph">'}
+<label style="margin-top:14px">Comentarios</label><textarea id="r-co" rows="3">${esc(d.coment||'')}</textarea>`}
+async function fotoShrink(f){const b=await createImageBitmap(f);for(const[m,q]of[[900,.7],[700,.6],[500,.5]]){const k=Math.min(1,m/Math.max(b.width,b.height)),c=document.createElement('canvas');c.width=Math.round(b.width*k);c.height=Math.round(b.height*k);c.getContext('2d').drawImage(b,0,0,c.width,c.height);const u=c.toDataURL('image/jpeg',q);if(u.length<600000)return u}throw new Error('grande')}
+document.addEventListener('input',e=>{const t=e.target;if(!draft||t.dataset.ps===undefined)return;draft.pasos=draft.pasos||[];draft.pasos[+t.dataset.ps]=t.value});
+document.addEventListener('change',async e=>{const t=e.target;if(t.id!=='r-ph'||!draft||!t.files[0])return;sync();try{draft.foto=await fotoShrink(t.files[0])}catch(x){note('No se pudo cargar la foto')}render(true)});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-ev2]');if(!b||!draft)return;const a=b.dataset.ev2;sync();
+ if(a==='addPaso')draft.pasos=[...(draft.pasos||[]),''];else if(a==='rmPaso')draft.pasos.splice(+b.dataset.k,1);else if(a==='rmFoto')draft.foto='';render(true)});
 
 // ===== EVENTO =====
 let evs=[];try{evs=JSON.parse(localStorage.getItem('tuki_evento')||'[]')}catch(e){}
