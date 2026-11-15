@@ -829,6 +829,7 @@ function evResult(){const acc={};for(const it of evs){const x=evItem(it.k),u=+it
  if(!rows.length)return{html:'<p class="mut">Cargá una cantidad mayor a 0 para ver los insumos necesarios.</p>',rows,total:0};
  let h='',c=null,total=0;for(const r of rows){if(r.cat!==c){c=r.cat;h+=`<div class="mut" style="margin:12px 0 2px;font-size:12px;text-transform:uppercase">${esc(c)}</div>`}total+=r.cost;h+=`<div class="row" style="padding:5px 0;gap:8px"><div class="sp"><div>${esc(r.n)}</div>${r.merma>0&&r.net>0?`<div class="mut" style="font-size:12px">neto ${r.ntx} · merma ${r.merma}%</div>`:''}</div><b>${r.txt}</b><span class="mut" style="min-width:76px;text-align:right">${money(r.cost)}</span></div>`}
  h+=`<div class="row" style="padding:10px 0 0;margin-top:10px;border-top:1px solid var(--bd)"><b class="sp">Costo estimado de insumos</b><b class="big">${money(total)}</b></div>`;return{html:h,rows,total}}
+function evText(w){const R=evResult().rows;if(!R.length)return'';const b=w?'*':'',hd=evs.map(it=>{const x=evItem(it.k);return x&&+it.q>0?'• '+x.label+': '+it.q+' '+x.un:''}).filter(Boolean).join('\n');return b+'Evento'+b+'\n'+hd+'\n\n'+b+'Insumos necesarios:'+b+'\n'+R.map(r=>'- '+r.n+': '+r.txt).join('\n')}
 function viewEvt(){
  const used=new Set(evs.map(x=>x.k)),opt=(k,t)=>used.has(k)?'':`<option value="${esc(k)}">${esc(t)}</option>`,P=[],R=[];
  for(const[id,r]of Object.entries(rec)){if(r.activo===false)continue;const L=r.tipo==='base'?R:P;if((r.sub||[]).length)r.sub.forEach(x=>L.push([id+'|'+x.id,r.nombre+' · '+x.n]));else L.push([id,r.nombre])}
@@ -836,14 +837,15 @@ function viewEvt(){
  let h=`<div class="card"><label>Agregar plato o receta al evento</label><select id="ev-add"><option value="">Elegir…</option>${og('Platos',P)}${og('Recetas',R)}</select></div>`;
  if(!evs.length)return h+'<p class="mut" style="padding:8px 4px">Elegí los platos y recetas que vas a preparar, indicá la cantidad de cada uno y te calculo los insumos necesarios.</p>';
  h+=evs.map((it,n)=>{const x=evItem(it.k);return`<div class="card" style="margin-bottom:8px"><div class="row" style="gap:8px"><div class="sp"><div>${x?esc(x.label):'(ya no existe)'}</div><div class="mut" style="font-size:12px">${x?(x.plato?'Plato':'Receta'):''}</div></div>${x?`<input type="number" inputmode="decimal" min="0" data-evq="${n}" value="${esc(it.q)}" style="width:90px"><span class="mut" style="min-width:56px">${esc(x.un)}</span>`:''}<button class="x" data-ev="rm" data-i="${n}" title="Quitar">✕</button></div></div>`}).join('');
- h+=`<div class="card"><div class="row" style="gap:8px"><div class="big sp">Insumos necesarios</div><button data-ev="copy">Copiar lista</button><button class="x" data-ev="clr">Vaciar</button></div><div id="ev-res">${evResult().html}</div><p class="mut" style="font-size:12px;margin-top:10px">Las cantidades incluyen la merma cargada en cada insumo.</p></div>`;
+ h+=`<div class="card"><div class="row" style="gap:8px"><div class="big sp">Insumos necesarios</div><button data-ev="copy">Copiar lista</button><button data-ev="wa">WhatsApp</button><button class="x" data-ev="clr">Vaciar</button></div><div id="ev-res">${evResult().html}</div><p class="mut" style="font-size:12px;margin-top:10px">Las cantidades incluyen la merma cargada en cada insumo.</p></div>`;
  return h}
 document.addEventListener('change',e=>{const t=e.target;if(t.id!=='ev-add'||!t.value)return;evs.push({k:t.value,q:1});evSave();render(true)});
 document.addEventListener('input',e=>{const t=e.target;if(t.dataset.evq===undefined)return;const it=evs[+t.dataset.evq];if(!it)return;it.q=t.value;evSave();const r=$('#ev-res');if(r)r.innerHTML=evResult().html});
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-ev]');if(!b)return;const a=b.dataset.ev;
  if(a==='rm'){evs.splice(+b.dataset.i,1);evSave();render(true)}
  else if(a==='clr'){if(await dlg('¿Vaciar el evento?')){evs=[];evSave();render(true)}}
- else if(a==='copy'){const R=evResult().rows;if(!R.length)return;const hd=evs.map(it=>{const x=evItem(it.k);return x&&+it.q>0?'• '+x.label+': '+it.q+' '+x.un:''}).filter(Boolean).join('\n');const tx='Evento\n'+hd+'\n\nInsumos necesarios:\n'+R.map(r=>'- '+r.n+': '+r.txt).join('\n');try{await navigator.clipboard.writeText(tx);toast('Lista copiada')}catch(x){note('No se pudo copiar')}}});
+ else if(a==='wa'){const tx=evText(true);if(!tx)return toast('Agregá platos o recetas primero');window.open('https://wa.me/?text='+encodeURIComponent(tx),'_blank')}
+ else if(a==='copy'){const tx=evText();if(!tx)return;try{await navigator.clipboard.writeText(tx);toast('Lista copiada')}catch(x){note('No se pudo copiar')}}});
 
 // ===== FIREBASE =====
 const FIREBASE_CONFIG={apiKey:"AIzaSyAvwiSIIUOQY0iqzX08fuTJwY0ZptGrjsc",authDomain:"tuki-a441b.firebaseapp.com",projectId:"tuki-a441b",appId:"1:79452557100:web:6e17898f95380a9c1de689"};
